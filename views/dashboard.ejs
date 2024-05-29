@@ -1,4 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow-y: auto;
+        }
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f8f9fa;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            max-width: 800px;
+            width: 100%;
+            animation: fadeIn 1s ease-in-out;
+            overflow-y: auto;
+            max-height: 90vh;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .logo {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 100px;
+            height: 100px;
+            background-image: url('/logo.png'); /* Replace with your logo URL */
+            background-size: cover;
+            background-position: center;
+        }
+        .title {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+            width: 100%;
+            z-index: 10;
+            position: relative;
+        }
+        .form-control {
+            height: 45px;
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: border-color 0.3s;
+            margin-bottom: 10px;
+        }
+        .btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s;
+            display: inline-flex;
+            align-items: center;
+        }
+        .btn-success {
+            background-color: #28a745;
+            color: #ffffff;
+            margin-right: 10px;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            color: #ffffff;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+            color: #ffffff;
+        }
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .date-filter {
+            margin-top: 20px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+        }
+        .form-date-range {
+            display: flex;
+            gap: 10px;
+            width: 70%;
+        }
+        .form-date-range input {
+            flex: 1;
+        }
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div style="position: absolute; top: 10px; right: 10px;">
+            <button class="btn btn-danger" onclick="location.href = '/logout'">Logout</button>
+        </div>
+        <div class="logo"></div>
+        <div class="title">Dashboard</div>
 
+        <div class="form-group">
+            <input type="text" id="name" class="form-control" placeholder="Enter user name">
+            <input type="text" id="event" class="form-control" placeholder="Enter event">
+            <div class="form-actions">
+                <button class="btn btn-success" onclick="addUser()">Add User</button>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <input type="file" id="csvFile" class="form-control">
+            <div class="form-actions">
+                <button class="btn btn-primary" onclick="uploadCSV()">Upload CSV</button>
+            </div>
+        </div>
+
+        <div class="form-group date-filter">
+            <div class="form-date-range">
+                <input type="date" id="startDate" class="form-control">
+                <input type="date" id="endDate" class="form-control">
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-primary" onclick="downloadTable()">Download Table</button>
+            </div>
+        </div>
+
+        <table id="userTable">
+            <thead>
+                <tr>
+                    <th>Select</th>
+                    <th>Name</th>
+                    <th>Event</th>
+                    <th>Created At</th>
+                    <th>First 4 Digits</th>
+                    <th>Next 4 Digits</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% users.forEach(user => { %>
+                    <tr>
+                        <td><input type="checkbox" class="delete-checkbox" data-id="<%= user._id %>"></td>
+                        <td><%= user.name %></td>
+                        <td><%= user.event %></td>
+                        <td><%= user.createdAt %></td>
+                        <td><%= user.first4Digits %></td>
+                        <td><%= user.next4Digits %></td>
+                        <td>
+                            <button class="btn btn-danger" onclick="deleteUser('<%= user._id %>')">Delete</button>
+                        </td>
+                    </tr>
+                <% }) %>
+            </tbody>
+        </table>
+        <div class="form-actions" style="margin-top: 20px;">
+            <button class="btn btn-danger" onclick="deleteSelectedUsers()">Delete Selected</button>
+        </div>
+    </div>
+    
     <script>
         function addUser() {
             const name = document.getElementById('name').value;
