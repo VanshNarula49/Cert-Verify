@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Character Input Verification</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #ffffff;
+            margin: 0;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 90vw; /* Maximum width of 90% of the viewport width */
+        }
+        .logo {
+            width: 100px;
+            height: 100px;
+            background-image: url('/logo.png'); /* Replace with your logo URL */
+            background-size: cover;
+            background-position: center;
+            margin-bottom: 20px;
+        }
+        .title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .input-boxes {
+            display: flex;
+            gap: 5px; /* Reduced gap between input boxes */
+            margin-bottom: 20px;
+            overflow-x: auto; /* Enable horizontal scrolling */
+        }
+        input[type="text"] {
+            width: 40px; /* Adjusted width for better fit */
+            height: 50px;
+            text-align: center;
+            font-size: 24px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: border-color 0.3s;
+        }
+        input[type="text"]:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+        button {
+            background-color: #007bff;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .message {
+            margin-top: 20px;
+            font-size: 16px;
+        }
+        /* Loader styles */
+        .loader-wrapper {
+            display: none; /* Hidden by default */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            justify-content: center;
+            align-items: center;
+        }
+        .loader {
+            border: 16px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 16px solid #3498db;
+            width: 120px;
+            height: 120px;
+            animation: spin 4s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo"></div>
+        <div class="title">Verify Your Certificate</div>
+        <div class="input-boxes">
+            <input type="text" maxlength="1">
+            <input type="text" maxlength="1">
+            <input type="text" maxlength="1">
+            <input type="text" maxlength="1">
+            <input type="text" maxlength="1">
+            <input type="text" maxlength="1">
+            <input type="text" maxlength="1">
+            <input type="text" maxlength="1">
+        </div>
+        <button onclick="verifyInput()">Verify</button>
+        <div class="message" id="message"></div>
+    </div>
+
+    <!-- Loader HTML -->
+    <div class="loader-wrapper" id="loader-wrapper">
+        <div class="loader"></div>
+    </div>
+
+    <script>
+        function verifyInput() {
+            const inputs = document.querySelectorAll('.input-boxes input');
+            const code = Array.from(inputs).map(input => input.value).join('');
+
+            if (code.length !== 8) {
+                showMessage('Please enter an 8-character code.', 'red');
+                return;
+            }
+
+            // Show the loader
+            document.getElementById('loader-wrapper').style.display = 'flex';
+
+            fetch('/validate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ code })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.text(); // Get the HTML response
+            })
+            .then(html => {
+                // Hide the loader
+                document.getElementById('loader-wrapper').style.display = 'none';
+
+                // Replace the current page content with the new HTML
+                document.open();
+                document.write(html);
+                document.close();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showMessage('No Certificate Found.', 'red');
+                // Hide the loader
+                document.getElementById('loader-wrapper').style.display = 'none';
+            });
+        }
+
+        function showMessage(message, color) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = message;
+            messageDiv.style.color = color;
+        }
+
+        document.querySelectorAll('.input-boxes input').forEach((input, index, inputs) => {
+            input.addEventListener('input', (event) => {
+                let value = event.target.value;
+                if (value) {
+                    value = value.toUpperCase();
+                    if (/^[0-9A-Z]$/.test(value)) {
+                        event.target.value = value;
+                        if (index < inputs.length - 1) {
+                            inputs[index + 1].focus();
+                        }
+                    } else {
+                        event.target.value = '';
+                    }
+                }
+            });
+
+            input.addEventListener('keydown', (event) => {
+                if (event.key === 'Backspace' && input.value === '' && index > 0) {
+                    inputs[index - 1].focus();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,107 @@
+
+    <script>
+        function addUser() {
+            const name = document.getElementById('name').value;
+            const event = document.getElementById('event').value;
+            fetch('/add-user', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name, event })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Failed to add user');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            });
+        }
+
+        function uploadCSV() {
+            const fileInput = document.getElementById('csvFile');
+            const formData = new FormData();
+            formData.append('csvFile', fileInput.files[0]);
+
+            fetch('/upload-csv', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Failed to upload CSV');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            });
+        }
+
+        function deleteUser(id) {
+            fetch(`/delete-user/${id}`, {
+                method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Failed to delete user');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            });
+        }
+
+        function deleteSelectedUsers() {
+            const checkboxes = document.querySelectorAll('.delete-checkbox:checked');
+            const ids = Array.from(checkboxes).map(checkbox => checkbox.getAttribute('data-id'));
+
+            fetch('/delete-users', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ ids })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Failed to delete selected users');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            });
+        }
+
+        function downloadTable() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            window.location.href = `/download-table?startDate=${startDate}&endDate=${endDate}`;
+        }
+
+        window.onload = function() {
+            const container = document.querySelector('.container');
+            if (container.scrollHeight > container.clientHeight) {
+                container.scrollTop = container.scrollHeight;
+            }
+        }
+    </script>
+</body>
+</html>
