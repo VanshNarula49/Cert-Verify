@@ -162,7 +162,15 @@
                 if (data.success) {
                     showMessage('Email Sent successfully!', 'green');
                 } else {
-                    showMessage("Details don't match. Please ensure you have an account on the community platform and are using the same username and email.", 'red');
+                    if (data.message.includes('Invalid input')) {
+                        showMessage('Please fill in all fields correctly.', 'red');
+                    } else if (data.message.includes('Verification failed')) {
+                        showMessage('The username and email do not match with a community account.', 'red');
+                    } else if (data.message.includes('Verification code not found')) {
+                        showMessage('No certificate found with that specific code.', 'red');
+                    } else {
+                        showMessage('An error occurred. Please try again.', 'red');
+                    }
                 }
             })
             .catch(error => {
