@@ -23,7 +23,7 @@
         .logo {
             width: 100px;
             height: 100px;
-            background-image: url('/logo.png'); /* Replace 'robify_logo.png' with your logo file path */
+            background-image: url('/logo.png'); /* Replace 'logo.png' with your logo file path */
             background-size: cover;
             background-position: center;
             margin: 0 auto 20px; /* Center the logo horizontally */
@@ -33,7 +33,9 @@
             font-size: 48px;
             color: #007bff;
             margin-bottom: 20px;
-            animation: rotate 2s linear infinite; /* Example animation */
+        }
+        .animated-certificate {
+            animation: rotate 2s linear infinite; /* Animation applied to the icon only */
         }
         .buttons {
             display: flex;
@@ -88,7 +90,7 @@
     <div class="container">
         <div class="logo"></div>
         <div class="icons">
-            <i class="fas fa-certificate"></i>
+            <i class="fas fa-certificate animated-certificate"></i>
         </div>
         <div class="buttons">
             <button class="button" onclick="window.location.href = '/validate';">Validate Your Certificate</button>
