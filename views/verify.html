@@ -22,12 +22,12 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            max-width: 90vw; /* Maximum width of 90% of the viewport width */
+            max-width: 90vw;
         }
         .logo {
             width: 100px;
             height: 100px;
-            background-image: url('/logo.png'); /* Replace with your logo URL */
+            background-image: url('/logo.png');
             background-size: cover;
             background-position: center;
             margin-bottom: 20px;
@@ -39,12 +39,12 @@
         }
         .input-boxes {
             display: flex;
-            gap: 5px; /* Reduced gap between input boxes */
+            gap: 5px;
             margin-bottom: 20px;
-            overflow-x: auto; /* Enable horizontal scrolling */
+            overflow-x: auto;
         }
         input[type="text"] {
-            width: 40px; /* Adjusted width for better fit */
+            width: 40px;
             height: 50px;
             text-align: center;
             font-size: 24px;
@@ -75,9 +75,8 @@
             margin-top: 20px;
             font-size: 16px;
         }
-        /* Loader styles */
         .loader-wrapper {
-            display: none; /* Hidden by default */
+            display: none;
             position: fixed;
             top: 0;
             left: 0;
@@ -93,7 +92,7 @@
             border-top: 16px solid #3498db;
             width: 120px;
             height: 120px;
-            animation: spin 4s linear infinite;
+            animation: spin 2s linear infinite;
         }
         @keyframes spin {
             0% { transform: rotate(0deg); }
@@ -119,7 +118,6 @@
         <div class="message" id="message"></div>
     </div>
 
-    <!-- Loader HTML -->
     <div class="loader-wrapper" id="loader-wrapper">
         <div class="loader"></div>
     </div>
@@ -134,7 +132,6 @@
                 return;
             }
 
-            // Show the loader
             document.getElementById('loader-wrapper').style.display = 'flex';
 
             fetch('/validate', {
@@ -145,25 +142,29 @@
                 body: JSON.stringify({ code })
             })
             .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.text(); // Get the HTML response
-            })
-            .then(html => {
-                // Hide the loader
                 document.getElementById('loader-wrapper').style.display = 'none';
 
-                // Replace the current page content with the new HTML
+                if (!response.ok) {
+                    return response.json().then(error => {
+                        if (response.status === 400) {
+                            showMessage('Invalid input.', 'red');
+                        } else if (response.status === 404) {
+                            showMessage('No certificate found with that specific code.', 'red');
+                        } else {
+                            showMessage('Internal server error. Please try again later.', 'red');
+                        }
+                        throw new Error(error.message);
+                    });
+                }
+                return response.text();
+            })
+            .then(html => {
                 document.open();
                 document.write(html);
                 document.close();
             })
             .catch(error => {
                 console.error('Error:', error);
-                showMessage('No Certificate Found.', 'red');
-                // Hide the loader
-                document.getElementById('loader-wrapper').style.display = 'none';
             });
         }
 
