@@ -11,16 +11,15 @@ const fs = require('fs');
 const Mongo = require("mongodb");
 const { log } = require('console');
 const MongoClient = Mongo.MongoClient;
-const url = "mongodb+srv://vansh:wF0EiAtblcJY68rE@cluster.q2mmc.mongodb.net/";
+const url = "";
 const client = new MongoClient(url);
 const dbName = "Robify";
 
-const API_KEY = "be96e32ddfab7951c7aca39eba638f7a-77316142-1e5b45e5";
-const DOMAIN = "robify.in";
+const API_KEY = "";
+const DOMAIN = "";
 const mailgun = new Mailgun(formData);
 const emailclient = mailgun.client({ username: "api", key: API_KEY });
-const adminPassword = "Robify678";
-const securecookie = "be96e32ddfab7951c7aca39eba638f7abe96e32ddfab7951c7aca39eba638f7abe96e32ddfab7951c7aca39eba638f7a";
+const securecookie = "";
 
 async function main() {
   await client.connect();
@@ -43,8 +42,8 @@ app.use(express.static('public'));
 const upload = multer({ dest: 'uploads/' });
 
 const apiConfig = {
-    apiKey: '48b184a540a7254a9ea5b2311018271ba2b7c154bc6caafc3628711a1be5969b',
-    apiUsername: 'Community-Admin',
+    apiKey: '',
+    apiUsername: '',
 };
 
 function adminAuth(req, res, next) {
@@ -56,7 +55,7 @@ function adminAuth(req, res, next) {
 }
 
 const verifyEmail = async (username, email) => {
-    const url = `https://community.robify.in/u/${username}/emails.json`;
+    const url = `https://{REDACTED}/${username}/emails.json`;
     const headers = {
         'Api-Key': apiConfig.apiKey,
         'Api-Username': apiConfig.apiUsername,
@@ -77,7 +76,7 @@ app.get("/login", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
-    if (req.body.username == "Robify@67890" && req.body.password == "Jain.Robify@67890") {
+    if (req.body.username == "" && req.body.password == "") {
         res.cookie("Password", securecookie, { maxAge: 2592000 }).redirect("/dashboard");
     } else {
         res.render("login", { msg: "Wrong Password" });
